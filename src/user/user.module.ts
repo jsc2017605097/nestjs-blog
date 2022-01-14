@@ -16,14 +16,26 @@ import {
 import {
   MailModule
 } from '../mail/mail.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './local.strategy';
+import { JwtStrategy } from './jwt-auth.strategy';
 
 @Module({
-  imports: [MongooseModule.forFeature([{
-    name: 'User',
-    schema: UserSchema
-  }]),
-    MailModule
+  imports: [
+    MongooseModule.forFeature([{
+      name: 'User',
+      schema: UserSchema
+    }]),
+    MailModule,
+    PassportModule,
+    ConfigModule.forRoot(),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1 hour' },
+    }),
   ],
   controllers: [UserController],
-  providers: [UserService]
+  providers: [UserService, LocalStrategy,JwtStrategy]
 }) export class UserModule { }
